@@ -1,0 +1,325 @@
+index.html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Investasi Crypto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2563eb;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.875rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .error {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .results {
+            background-color: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease-out;
+        }
+
+        .results.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: #4b5563;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .result-value {
+            color: #1f2937;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .profit {
+            color: #059669;
+        }
+
+        .loss {
+            color: #dc2626;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kalkulator Investasi Crypto</h1>
+        
+        <form id="cryptoForm">
+            <div class="form-group">
+                <label for="cryptoSymbol">Nama/Symbol Cryptocurrency</label>
+                <input type="text" id="cryptoSymbol" required placeholder="Contoh: BTC, ETH">
+                <div class="error" id="symbolError">Harap masukkan symbol cryptocurrency</div>
+            </div>
+
+            <div class="form-group">
+                <label for="amount">Jumlah Crypto</label>
+                <input type="number" id="amount" required step="any" min="0" placeholder="Contoh: 0.5">
+                <div class="error" id="amountError">Harap masukkan jumlah yang valid (lebih dari 0)</div>
+            </div>
+
+            <div class="form-group">
+                <label for="buyPrice">Harga Beli per Unit (USD)</label>
+                <input type="number" id="buyPrice" required step="any" min="0" placeholder="Contoh: 50000">
+                <div class="error" id="buyPriceError">Harap masukkan harga beli yang valid (lebih dari 0)</div>
+            </div>
+
+            <div class="form-group">
+                <label for="currentPrice">Harga Saat Ini per Unit (USD)</label>
+                <input type="number" id="currentPrice" required step="any" min="0" placeholder="Contoh: 60000">
+                <div class="error" id="currentPriceError">Harap masukkan harga saat ini yang valid (lebih dari 0)</div>
+            </div>
+
+            <div class="buttons">
+                <button type="button" onclick="calculateInvestment()" class="btn-primary">Hitung</button>
+                <button type="button" onclick="resetCalculator()" class="btn-secondary">Reset</button>
+            </div>
+        </form>
+
+        <div id="results" class="results">
+            <div class="result-item">
+                <div class="result-label">Nilai Investasi Awal</div>
+                <div class="result-value" id="initialInvestment">$0.00</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Nilai Investasi Saat Ini</div>
+                <div class="result-value" id="currentInvestment">$0.00</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Keuntungan/Kerugian</div>
+                <div class="result-value" id="profitLoss">$0.00</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Persentase Keuntungan/Kerugian</div>
+                <div class="result-value" id="percentage">0.00%</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function validateInputs() {
+            let isValid = true;
+            const inputs = {
+                cryptoSymbol: document.getElementById('cryptoSymbol'),
+                amount: document.getElementById('amount'),
+                buyPrice: document.getElementById('buyPrice'),
+                currentPrice: document.getElementById('currentPrice')
+            };
+
+            // Reset all error messages
+            document.querySelectorAll('.error').forEach(error => error.style.display = 'none');
+
+            // Validate Symbol
+            if (!inputs.cryptoSymbol.value.trim()) {
+                document.getElementById('symbolError').style.display = 'block';
+                isValid = false;
+            }
+
+            // Validate Amount
+            if (!inputs.amount.value || parseFloat(inputs.amount.value) <= 0) {
+                document.getElementById('amountError').style.display = 'block';
+                isValid = false;
+            }
+
+            // Validate Buy Price
+            if (!inputs.buyPrice.value || parseFloat(inputs.buyPrice.value) <= 0) {
+                document.getElementById('buyPriceError').style.display = 'block';
+                isValid = false;
+            }
+
+            // Validate Current Price
+            if (!inputs.currentPrice.value || parseFloat(inputs.currentPrice.value) <= 0) {
+                document.getElementById('currentPriceError').style.display = 'block';
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function calculateInvestment() {
+            if (!validateInputs()) {
+                return;
+            }
+            
+            const amount = parseFloat(document.getElementById('amount').value);
+            const buyPrice = parseFloat(document.getElementById('buyPrice').value);
+            const currentPrice = parseFloat(document.getElementById('currentPrice').value);
+
+            try {
+                const initialInvestment = amount * buyPrice;
+                const currentInvestment = amount * currentPrice;
+                const profitLoss = currentInvestment - initialInvestment;
+                const percentageChange = ((currentInvestment - initialInvestment) / initialInvestment) * 100;
+
+                document.getElementById('initialInvestment').textContent = formatCurrency(initialInvestment);
+                document.getElementById('currentInvestment').textContent = formatCurrency(currentInvestment);
+                
+                const profitLossElement = document.getElementById('profitLoss');
+                profitLossElement.textContent = formatCurrency(profitLoss);
+                profitLossElement.className = 'result-value ' + (profitLoss >= 0 ? 'profit' : 'loss');
+
+                const percentageElement = document.getElementById('percentage');
+                percentageElement.textContent = `${percentageChange.toFixed(2)}%`;
+                percentageElement.className = 'result-value ' + (percentageChange >= 0 ? 'profit' : 'loss');
+
+                document.getElementById('results').classList.add('show');
+            } catch (error) {
+                console.error('Calculation error:', error);
+                alert('Terjadi kesalahan dalam perhitungan. Silakan cek kembali input Anda.');
+            }
+        }
+
+        function resetCalculator() {
+            document.getElementById('cryptoForm').reset();
+            document.getElementById('results').classList.remove('show');
+            document.querySelectorAll('.error').forEach(error => error.style.display = 'none');
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        }
+
+        // Add input event listeners for real-time validation
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                const errorId = this.id + 'Error';
+                const errorElement = document.getElementById(errorId);
+                if (errorElement) {
+                    errorElement.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
